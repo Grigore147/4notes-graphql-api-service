@@ -1,0 +1,39 @@
+name: '4notes-graphql-api'
+
+x-app-default-env: &app-default-env
+    APP_DEBUG: false
+
+services:
+    4notes-graphql-api-service:
+        container_name: 4notes-graphql-api-service
+        image: 4notes/graphql-api-service-app:latest
+        build:
+            context: .
+            dockerfile: ./docker/Dockerfile
+            target: app-development
+        env_file: ./docker/docker-compose.env
+        environment:
+            <<: *app-default-env
+            GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI:-}
+            GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+            GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+        volumes:
+            - ./:/app
+            - /app/node_modules
+        healthcheck:
+            test: ['CMD', 'curl -fs http://localhost:3000/health || exit 1;']
+            interval: 10s
+            timeout: 5s
+            retries: 10
+            start_period: 10s
+        restart: unless-stopped
+        ports:
+            - 127.0.0.1:5000:3000
+        networks:
+            - 4notes-network
+        extra_hosts:
+            - 'host.docker.internal:host-gateway'
+
+networks:
+    4notes-network:
+        external: true

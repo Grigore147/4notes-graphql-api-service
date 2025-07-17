@@ -1,0 +1,18 @@
+{
+    "editor.formatOnSave": true,
+    "eslint.codeActionsOnSave.mode": "all",
+    "cSpell.words": [
+        "graphiql"
+    ],
+    "aws.telemetry": false,
+    "aws.stepfunctions.asl.format.enable": false,
+    "cfnLint.completion": false,
+    "cfnLint.format.bracketSpacing": false,
+    "cfnLint.format.enable": false,
+    "cfnLint.hover": false,
+    "cfnLint.validate": false,
+    "cSpell.enabled": true,
+    "prettier.configPath": ".prettierrc",
+    "prettier.printWidth": 120,
+    "yaml.format.printWidth": 120
+}

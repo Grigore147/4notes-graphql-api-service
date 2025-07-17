@@ -1,0 +1,211 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Note {
+  id: ID!
+  userId: String!
+  notebookId: String!
+  notebook: Notebook
+  title: String!
+  content: String!
+  createdAt: String
+  updatedAt: String
+}
+
+type Notebook {
+  id: ID!
+  userId: String!
+  spaceId: String!
+  space: Space
+  stackId: String!
+  stack: Stack
+  name: String!
+  createdAt: String
+  updatedAt: String
+  notes(page: Int! = 1, limit: Int! = 25, offset: Int, sort: JSON, include: [String!], search: String, authToken: String, id: String, notebookId: String, userId: String): [Note!]!
+}
+
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+
+type Stack {
+  id: ID!
+  userId: String!
+  spaceId: String!
+  space: Space
+  name: String!
+  createdAt: String
+  updatedAt: String
+  notebooks(page: Int! = 1, limit: Int! = 25, offset: Int, sort: JSON, include: [String!], search: String, authToken: String, id: String, spaceId: String, stackId: String, userId: String): [Notebook!]!
+}
+
+"""Space"""
+type Space {
+  id: ID!
+  userId: String!
+  name: String!
+  description: String
+  createdAt: String
+  updatedAt: String
+  stacks(page: Int! = 1, limit: Int! = 25, offset: Int, sort: JSON, include: [String!], search: String, authToken: String, id: String, spaceId: String, userId: String): [Stack!]!
+  notebooks(page: Int! = 1, limit: Int! = 25, offset: Int, sort: JSON, include: [String!], search: String, authToken: String, id: String, spaceId: String, stackId: String, userId: String): [Notebook!]!
+}
+
+type Meta {
+  requestId: String!
+  correlationId: String!
+  type: String!
+}
+
+type Pagination {
+  from: Float!
+  to: Float!
+  total: Float!
+  perPage: Float!
+  currentPage: Float!
+  lastPage: Float!
+}
+
+type PaginationMeta {
+  requestId: String!
+  correlationId: String!
+  type: String!
+  pagination: Pagination!
+}
+
+type SpaceResource {
+  status: String!
+  code: Float!
+  message: String!
+  meta: Meta!
+  data: Space!
+}
+
+type SpaceResourceCollection {
+  status: String!
+  code: Float!
+  message: String!
+  meta: PaginationMeta!
+  data: [Space!]!
+}
+
+type StackResource {
+  status: String!
+  code: Float!
+  message: String!
+  meta: Meta!
+  data: Stack!
+}
+
+type StackResourceCollection {
+  status: String!
+  code: Float!
+  message: String!
+  meta: PaginationMeta!
+  data: [Stack!]!
+}
+
+type NotebookResource {
+  status: String!
+  code: Float!
+  message: String!
+  meta: Meta!
+  data: Notebook!
+}
+
+type NotebookResourceCollection {
+  status: String!
+  code: Float!
+  message: String!
+  meta: PaginationMeta!
+  data: [Notebook!]!
+}
+
+type NoteResource {
+  status: String!
+  code: Float!
+  message: String!
+  meta: Meta!
+  data: Note!
+}
+
+type NoteResourceCollection {
+  status: String!
+  code: Float!
+  message: String!
+  meta: PaginationMeta!
+  data: [Note!]!
+}
+
+type Query {
+  spaces(page: Int! = 1, limit: Int! = 25, offset: Int, sort: JSON, include: [String!], search: String, authToken: String, id: String, userId: String): SpaceResourceCollection!
+  space(id: String!): SpaceResource
+  stacks(page: Int! = 1, limit: Int! = 25, offset: Int, sort: JSON, include: [String!], search: String, authToken: String, id: String, spaceId: String, userId: String): StackResourceCollection!
+  stack(id: String!): StackResource
+  notebooks(page: Int! = 1, limit: Int! = 25, offset: Int, sort: JSON, include: [String!], search: String, authToken: String, id: String, spaceId: String, stackId: String, userId: String): NotebookResourceCollection!
+  notebook(id: String!): NotebookResource
+  notes(page: Int! = 1, limit: Int! = 25, offset: Int, sort: JSON, include: [String!], search: String, authToken: String, id: String, notebookId: String, userId: String): NoteResourceCollection!
+  note(id: String!): NoteResource
+}
+
+type Mutation {
+  createSpace(data: CreateSpaceInput!): SpaceResource!
+  updateSpace(id: String!, data: UpdateSpaceInput!): SpaceResource!
+  deleteSpace(id: String!): SpaceResource!
+  createStack(data: CreateStackInput!): StackResource!
+  updateStack(id: String!, data: UpdateStackInput!): StackResource!
+  deleteStack(id: String!): StackResource!
+  createNotebook(data: CreateNotebookInput!): NotebookResource!
+  updateNotebook(id: String!, data: UpdateNotebookInput!): NotebookResource!
+  deleteNotebook(id: String!): NotebookResource!
+  createNote(data: CreateNoteInput!): NoteResource!
+  updateNote(id: String!, data: UpdateNoteInput!): NoteResource!
+  deleteNote(id: String!): NoteResource!
+}
+
+input CreateSpaceInput {
+  name: String!
+  description: String = ""
+}
+
+input UpdateSpaceInput {
+  name: String
+  description: String
+}
+
+input CreateStackInput {
+  spaceId: String!
+  name: String!
+}
+
+input UpdateStackInput {
+  spaceId: String
+  name: String
+}
+
+input CreateNotebookInput {
+  spaceId: String!
+  stackId: String!
+  name: String!
+}
+
+input UpdateNotebookInput {
+  spaceId: String
+  stackId: String
+  name: String
+}
+
+input CreateNoteInput {
+  notebookId: String!
+  title: String!
+  content: String = ""
+}
+
+input UpdateNoteInput {
+  notebookId: String
+  title: String
+  content: String
+}
