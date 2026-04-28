@@ -1,9 +1,7 @@
 {
     "editor.formatOnSave": true,
     "eslint.codeActionsOnSave.mode": "all",
-    "cSpell.words": [
-        "graphiql"
-    ],
+    "cSpell.words": ["graphiql"],
     "aws.telemetry": false,
     "aws.stepfunctions.asl.format.enable": false,
     "cfnLint.completion": false,
@@ -12,7 +10,9 @@
     "cfnLint.hover": false,
     "cfnLint.validate": false,
     "cSpell.enabled": true,
+    "prettier.prettierPath": "./node_modules/prettier",
     "prettier.configPath": ".prettierrc",
     "prettier.printWidth": 120,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
     "yaml.format.printWidth": 120
 }

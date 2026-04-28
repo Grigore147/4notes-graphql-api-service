@@ -5,13 +5,9 @@ import { GqlExecutionContext } from '@nestjs/graphql';
 import { GraphQLError } from 'graphql';
 
 import { ValidationException } from 'src/exceptions/validation.exception';
+import type { GqlContext } from 'src/auth/guards/auth.guard';
 
 export class GraphQLValidationError extends GraphQLError {}
-
-export interface GraphQLContext {
-    req: Request;
-    res: Response;
-}
 
 type HttpHeaders = Headers & {
     'x-request-id'?: string;
@@ -23,7 +19,7 @@ export class GraphQLValidationExceptionFilter implements ExceptionFilter {
     catch(exception: BadRequestException, host: ArgumentsHost) {
         if (exception instanceof ValidationException) {
             const gqlContext = GqlExecutionContext.create(host as ExecutionContext);
-            const request = gqlContext.getContext<GraphQLContext>().req;
+            const request = gqlContext.getContext<GqlContext>().req;
             const headers: HttpHeaders = request.headers;
 
             throw new GraphQLValidationError(exception.message, {

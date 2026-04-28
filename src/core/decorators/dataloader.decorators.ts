@@ -1,7 +1,7 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
+import type { GqlContext } from 'src/auth/guards/auth.guard';
 
-import { GqlContext } from 'src/app.module';
 import { DataloadersMap } from 'src/graphql/dataloader/dataloader.factory';
 
 export function DataLoader<K extends keyof DataloadersMap>(key: K) {

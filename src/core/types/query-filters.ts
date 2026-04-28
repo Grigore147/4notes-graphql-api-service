@@ -9,7 +9,7 @@ export interface IQueryFilters {
     sort?: Record<string, string>;
     include?: string[];
     search?: string;
-    authToken?: string;
+    accessToken?: string;
 }
 
 @ArgsType()
@@ -50,5 +50,5 @@ export class QueryFilters implements IQueryFilters {
     @IsOptional()
     @IsNotEmpty()
     @HideField()
-    authToken?: string;
+    accessToken?: string;
 }

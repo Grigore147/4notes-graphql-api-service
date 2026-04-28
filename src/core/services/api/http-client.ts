@@ -2,16 +2,16 @@ import { HttpStatus } from '@nestjs/common';
 
 import { GraphQLValidationError } from 'src/graphql/graphql-exception.filter';
 import { ApiErrorResponse } from './api-error';
-import { QueryFilters } from 'src/core/types/query-filters';
+import { QueryFilters, type IQueryFilters } from 'src/core/types/query-filters';
 
 export class HttpClient {
     protected baseUrl: string;
-    protected authToken?: string;
+    protected accessToken?: string;
     protected defaultHeaders: Record<string, string>;
 
-    constructor(baseUrl: string, authToken?: string) {
+    constructor(baseUrl: string, accessToken?: string) {
         this.baseUrl = baseUrl.replace(/\/$/, '');
-        this.authToken = authToken;
+        this.accessToken = accessToken;
         this.defaultHeaders = {
             'Content-Type': 'application/json',
             Accept: 'application/json'
@@ -21,11 +21,9 @@ export class HttpClient {
     protected async request<T>(
         method: string,
         endpoint: string,
-        query: QueryFilters = {},
+        query: IQueryFilters = {},
         options: RequestInit = {}
     ): Promise<T> {
-        const url = `${this.baseUrl}${endpoint}${this.buildQueryString(query)}`;
-
         const config: RequestInit & {
             headers: HeadersInit;
         } = {
@@ -37,9 +35,13 @@ export class HttpClient {
             }
         };
 
-        if (query.authToken || this.authToken) {
-            config.headers['Authorization'] = `Bearer ${query.authToken ?? this.authToken}`;
+        if (query.accessToken || this.accessToken) {
+            config.headers['Authorization'] = `Bearer ${query.accessToken ?? this.accessToken}`;
+
+            delete query.accessToken;
         }
+
+        const url = `${this.baseUrl}${endpoint}${this.buildQueryString(query)}`;
 
         const response = await fetch(url, config);
 
@@ -88,7 +90,7 @@ export class HttpClient {
     }
 
     public buildQueryString(options: QueryFilters = {}): string {
-        const reservedKeys = ['page', 'limit', 'offset', 'sort', 'include', 'search', 'authToken'];
+        const reservedKeys = ['page', 'limit', 'offset', 'sort', 'include', 'search', 'accessToken'];
         const params = new URLSearchParams();
 
         if (options.page !== undefined) params.append('page', options.page.toString());
@@ -117,14 +119,14 @@ export class HttpClient {
         return queryString ? `?${queryString}` : '';
     }
 
-    public setAuthToken(token: string): HttpClient {
-        this.authToken = token;
+    public setAccessToken(token: string): HttpClient {
+        this.accessToken = token;
 
         return this;
     }
 
-    public clearAuthToken(): HttpClient {
-        this.authToken = undefined;
+    public clearAccessToken(): HttpClient {
+        this.accessToken = undefined;
 
         return this;
     }

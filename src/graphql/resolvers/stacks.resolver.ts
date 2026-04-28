@@ -3,8 +3,7 @@ import { Logger } from '@nestjs/common';
 
 import { Resolver, Query, Args, Mutation, Parent, ResolveField } from '@nestjs/graphql';
 
-import { GqlAuthGuard } from 'src/core/guards/auth.guard';
-import { AuthToken } from 'src/core/decorators/auth-token.decorator';
+import { GqlAuthGuard } from 'src/auth/guards/auth.guard';
 import { DataLoader } from 'src/core/decorators/dataloader.decorators';
 
 import { StackService } from 'src/services/stack.service';
@@ -18,6 +17,8 @@ import { SpaceByIdLoader } from '../dataloader/space-by-id.loader';
 import { NotebooksByStackIdLoader } from '../dataloader/notebooks-by-stack-id.loader';
 
 import { StackResource, StackResourceCollection } from '../resources/stack.resource';
+import type { UserInterface } from 'src/auth/interfaces/user.entity';
+import { User } from 'src/auth/decorators/user.decorator';
 
 @Resolver(() => Stack)
 @UseGuards(GqlAuthGuard)
@@ -27,37 +28,35 @@ export class StacksResolver {
     constructor(private readonly stackService: StackService) {}
 
     @Query(() => StackResourceCollection)
-    async stacks(@Args() args: StacksQueryFilters, @AuthToken() authToken?: string) {
-        return this.stackService.find({ ...args, authToken });
+    async stacks(@Args() queryFilters: StacksQueryFilters, @User() user: UserInterface) {
+        queryFilters.accessToken = user.accessToken;
+
+        return this.stackService.find(queryFilters);
     }
 
     @Query(() => StackResource, { nullable: true })
-    async stack(@Args('id') id: string, @AuthToken() authToken?: string) {
-        return this.stackService.findOneById(id, { authToken });
+    async stack(@Args('id') id: string, @User() user: UserInterface) {
+        return this.stackService.findOneById(id, { accessToken: user.accessToken });
     }
 
     @Mutation(() => StackResource)
-    async createStack(@Args('data') data: CreateStackInput, @AuthToken() authToken?: string) {
-        return this.stackService.create(data, { authToken });
+    async createStack(@Args('data') data: CreateStackInput, @User() user: UserInterface) {
+        return this.stackService.create(data, { accessToken: user.accessToken });
     }
 
     @Mutation(() => StackResource)
-    async updateStack(@Args('id') id: string, @Args('data') data: UpdateStackInput, @AuthToken() authToken?: string) {
-        return this.stackService.update(id, data, { authToken });
+    async updateStack(@Args('id') id: string, @Args('data') data: UpdateStackInput, @User() user: UserInterface) {
+        return this.stackService.update(id, data, { accessToken: user.accessToken });
     }
 
     @Mutation(() => StackResource)
-    async deleteStack(@Args('id') id: string, @AuthToken() authToken?: string) {
-        return this.stackService.delete(id, { authToken });
+    async deleteStack(@Args('id') id: string, @User() user: UserInterface) {
+        return this.stackService.delete(id, { accessToken: user.accessToken });
     }
 
     @ResolveField(() => Space)
-    async space(
-        @Parent() stack: Stack,
-        @DataLoader(SpaceById) space: SpaceByIdLoader,
-        @AuthToken() authToken?: string
-    ) {
-        return space.load({ id: stack.spaceId, authToken });
+    async space(@Parent() stack: Stack, @DataLoader(SpaceById) space: SpaceByIdLoader, @User() user: UserInterface) {
+        return space.load({ id: stack.spaceId, accessToken: user.accessToken });
     }
 
     @ResolveField(() => [Notebook])
@@ -65,10 +64,10 @@ export class StacksResolver {
         @Parent() stack: Stack,
         @DataLoader(NotebooksByStackId) notebooks: NotebooksByStackIdLoader,
         @Args() queryFilters: NotebooksQueryFilters,
-        @AuthToken() authToken?: string
+        @User() user: UserInterface
     ) {
         queryFilters.stackId = stack.id;
-        queryFilters.authToken = authToken;
+        queryFilters.accessToken = user.accessToken;
 
         return notebooks.load(queryFilters);
     }

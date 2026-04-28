@@ -6,7 +6,7 @@ export type StackEntityResponse = IApiResponse<Stack>;
 export type StackCollectionResponse = IApiPaginatedResponse<Stack>;
 
 export class StacksApi extends BaseRestClient<StackEntityResponse, StackCollectionResponse> {
-    constructor(baseUrl: string, authToken?: string) {
-        super(`${baseUrl}/stacks`, authToken);
+    constructor(baseUrl: string, accessToken?: string) {
+        super(`${baseUrl}/stacks`, accessToken);
     }
 }

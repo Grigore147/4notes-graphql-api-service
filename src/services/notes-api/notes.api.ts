@@ -6,7 +6,7 @@ export type NoteEntityResponse = IApiResponse<Note>;
 export type NoteCollectionResponse = IApiPaginatedResponse<Note>;
 
 export class NotesApi extends BaseRestClient<NoteEntityResponse, NoteCollectionResponse> {
-    constructor(baseUrl: string, authToken?: string) {
-        super(`${baseUrl}/notes`, authToken);
+    constructor(baseUrl: string, accessToken?: string) {
+        super(`${baseUrl}/notes`, accessToken);
     }
 }

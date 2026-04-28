@@ -1,12 +1,14 @@
 import { join } from 'path';
 
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { CacheModule } from '@nestjs/cache-manager';
+import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { GraphQLFormattedError } from 'graphql';
 
-import { createDataLoaders, DataloadersMap } from './graphql/dataloader/dataloader.factory';
+import { createDataLoaders } from './graphql/dataloader/dataloader.factory';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -22,23 +24,36 @@ import { NotebookService } from './services/notebook.service';
 import { StackService } from './services/stack.service';
 import { SpaceService } from './services/space.service';
 
-import config from './config';
+import { Space } from './notes/entities/space.entity';
+import { Stack } from './notes/entities/stack.entity';
+import { Notebook } from './notes/entities/notebook.entity';
+import { Note } from './notes/entities/note.entity';
 
-export interface GqlContext {
-    req: Request & {
-        user?: any;
-    };
-    res: Response;
-    authToken?: string;
-    dataloaders: DataloadersMap;
-}
+import config from './config';
+import { AuthModule } from './auth/auth.module';
+import type { GqlContext } from './auth/guards/auth.guard';
 
 @Module({
     imports: [
-        ConfigModule.forRoot({
-            isGlobal: true,
-            load: [config]
+        ConfigModule.forRoot({ isGlobal: true, load: [config] }),
+        CacheModule.register({ isGlobal: true }),
+        TypeOrmModule.forRootAsync({
+            imports: [ConfigModule],
+            inject: [ConfigService],
+            useFactory: (config: ConfigService): TypeOrmModuleOptions => ({
+                // type: configService.get<DatabaseType>('db.type', 'postgres'),
+                type: 'postgres',
+                host: config.get<string>('db.host', 'localhost'),
+                port: config.get<number>('db.port', 5432),
+                username: config.get<string>('db.user', 'root'),
+                password: config.get<string>('db.pass', 'root'),
+                database: config.get<string>('db.name', 'test'),
+                entities: [__dirname + '/entities/*{.ts,.js}'],
+                autoLoadEntities: true,
+                synchronize: false
+            })
         }),
+        TypeOrmModule.forFeature([Space, Stack, Notebook, Note]),
         ServicesModule,
         GraphQLModule.forRootAsync<ApolloDriverConfig>({
             driver: ApolloDriver,
@@ -53,12 +68,9 @@ export interface GqlContext {
                 playground: false,
                 autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
                 context: ({ req, res }: GqlContext) => {
-                    const authHeader = (req.headers['authorization'] as string) || '';
-                    const authToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : undefined;
-
                     const dataloaders = createDataLoaders({ spaceService, stackService, notebookService, noteService });
 
-                    return { req, res, authToken, dataloaders };
+                    return { req, res, dataloaders };
                 },
                 formatError: (formattedError: GraphQLFormattedError): any => {
                     return {
@@ -70,7 +82,8 @@ export interface GqlContext {
                 }
             }),
             inject: [SpaceService, StackService, NotebookService, NoteService]
-        })
+        }),
+        AuthModule
     ],
     controllers: [AppController],
     providers: [AppService, SpacesResolver, StacksResolver, NotebooksResolver, NotesResolver]

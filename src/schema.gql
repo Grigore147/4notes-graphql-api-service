@@ -23,7 +23,7 @@ type Notebook {
   name: String!
   createdAt: String
   updatedAt: String
-  notes(page: Int! = 1, limit: Int! = 25, offset: Int, sort: JSON, include: [String!], search: String, authToken: String, id: String, notebookId: String, userId: String): [Note!]!
+  notes(page: Int! = 1, limit: Int! = 25, offset: Int, sort: JSON, include: [String!], search: String, accessToken: String, id: String, notebookId: String, userId: String): [Note!]!
 }
 
 """
@@ -39,7 +39,7 @@ type Stack {
   name: String!
   createdAt: String
   updatedAt: String
-  notebooks(page: Int! = 1, limit: Int! = 25, offset: Int, sort: JSON, include: [String!], search: String, authToken: String, id: String, spaceId: String, stackId: String, userId: String): [Notebook!]!
+  notebooks(page: Int! = 1, limit: Int! = 25, offset: Int, sort: JSON, include: [String!], search: String, accessToken: String, id: String, spaceId: String, stackId: String, userId: String): [Notebook!]!
 }
 
 """Space"""
@@ -50,8 +50,8 @@ type Space {
   description: String
   createdAt: String
   updatedAt: String
-  stacks(page: Int! = 1, limit: Int! = 25, offset: Int, sort: JSON, include: [String!], search: String, authToken: String, id: String, spaceId: String, userId: String): [Stack!]!
-  notebooks(page: Int! = 1, limit: Int! = 25, offset: Int, sort: JSON, include: [String!], search: String, authToken: String, id: String, spaceId: String, stackId: String, userId: String): [Notebook!]!
+  stacks(page: Int! = 1, limit: Int! = 25, offset: Int, sort: JSON, include: [String!], search: String, accessToken: String, id: String, spaceId: String, userId: String): [Stack!]!
+  notebooks(page: Int! = 1, limit: Int! = 25, offset: Int, sort: JSON, include: [String!], search: String, accessToken: String, id: String, spaceId: String, stackId: String, userId: String): [Notebook!]!
 }
 
 type Meta {
@@ -141,13 +141,13 @@ type NoteResourceCollection {
 }
 
 type Query {
-  spaces(page: Int! = 1, limit: Int! = 25, offset: Int, sort: JSON, include: [String!], search: String, authToken: String, id: String, userId: String): SpaceResourceCollection!
+  spaces(page: Int! = 1, limit: Int! = 25, offset: Int, sort: JSON, include: [String!], search: String, accessToken: String, id: String, userId: String): SpaceResourceCollection!
   space(id: String!): SpaceResource
-  stacks(page: Int! = 1, limit: Int! = 25, offset: Int, sort: JSON, include: [String!], search: String, authToken: String, id: String, spaceId: String, userId: String): StackResourceCollection!
+  stacks(page: Int! = 1, limit: Int! = 25, offset: Int, sort: JSON, include: [String!], search: String, accessToken: String, id: String, spaceId: String, userId: String): StackResourceCollection!
   stack(id: String!): StackResource
-  notebooks(page: Int! = 1, limit: Int! = 25, offset: Int, sort: JSON, include: [String!], search: String, authToken: String, id: String, spaceId: String, stackId: String, userId: String): NotebookResourceCollection!
+  notebooks(page: Int! = 1, limit: Int! = 25, offset: Int, sort: JSON, include: [String!], search: String, accessToken: String, id: String, spaceId: String, stackId: String, userId: String): NotebookResourceCollection!
   notebook(id: String!): NotebookResource
-  notes(page: Int! = 1, limit: Int! = 25, offset: Int, sort: JSON, include: [String!], search: String, authToken: String, id: String, notebookId: String, userId: String): NoteResourceCollection!
+  notes(page: Int! = 1, limit: Int! = 25, offset: Int, sort: JSON, include: [String!], search: String, accessToken: String, id: String, notebookId: String, userId: String): NoteResourceCollection!
   note(id: String!): NoteResource
 }
 

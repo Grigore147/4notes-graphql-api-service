@@ -5,7 +5,7 @@ ARG NODE_ENV=local
 ARG APP_DEBUG=false
 ARG APP_PORT=3000
 
-ENV TINI_VERSION=0.19.0-1
+ENV TINI_VERSION=0.19.*
 ENV NODE_ENV=${NODE_ENV}
 ENV APP_DEBUG=${APP_DEBUG}
 ENV APP_PORT=${APP_PORT}
@@ -42,11 +42,10 @@ COPY --chown=node:node . .
 # BUILD
 FROM app-development AS app-build
 
-RUN npm run build
-
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 
+RUN npm run build
 RUN npm ci --ignore-scripts --omit=dev && npm cache clean --force
 
 

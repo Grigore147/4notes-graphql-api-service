@@ -6,7 +6,7 @@ export type NotebookEntityResponse = IApiResponse<Notebook>;
 export type NotebookCollectionResponse = IApiPaginatedResponse<Notebook>;
 
 export class NotebooksApi extends BaseRestClient<NotebookEntityResponse, NotebookCollectionResponse> {
-    constructor(baseUrl: string, authToken?: string) {
-        super(`${baseUrl}/notebooks`, authToken);
+    constructor(baseUrl: string, accessToken?: string) {
+        super(`${baseUrl}/notebooks`, accessToken);
     }
 }

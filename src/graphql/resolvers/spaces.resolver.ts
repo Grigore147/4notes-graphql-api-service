@@ -3,8 +3,10 @@ import { Logger } from '@nestjs/common';
 
 import { Resolver, Query, Args, Mutation, Parent, ResolveField } from '@nestjs/graphql';
 
-import { GqlAuthGuard } from 'src/core/guards/auth.guard';
-import { AuthToken } from 'src/core/decorators/auth-token.decorator';
+import { User } from 'src/auth/decorators/user.decorator';
+import type { UserInterface } from 'src/auth/interfaces/user.entity';
+
+import { GqlAuthGuard } from 'src/auth/guards/auth.guard';
 import { DataLoader } from 'src/core/decorators/dataloader.decorators';
 
 import { SpaceService } from 'src/services/space.service';
@@ -27,30 +29,30 @@ export class SpacesResolver {
     constructor(private readonly spaceService: SpaceService) {}
 
     @Query(() => SpaceResourceCollection)
-    async spaces(@Args() queryFilters: SpacesQueryFilters, @AuthToken() authToken?: string) {
-        queryFilters.authToken = authToken;
+    async spaces(@Args() queryFilters: SpacesQueryFilters, @User() user: UserInterface) {
+        queryFilters.accessToken = user.accessToken;
 
         return this.spaceService.find(queryFilters);
     }
 
     @Query(() => SpaceResource, { nullable: true })
-    async space(@Args('id') id: string, @AuthToken() authToken?: string) {
-        return this.spaceService.findOneById(id, { authToken });
+    async space(@Args('id') id: string, @User() user: UserInterface) {
+        return this.spaceService.findOneById(id, { accessToken: user.accessToken });
     }
 
     @Mutation(() => SpaceResource)
-    async createSpace(@Args('data') data: CreateSpaceInput, @AuthToken() authToken?: string) {
-        return this.spaceService.create(data, { authToken });
+    async createSpace(@Args('data') data: CreateSpaceInput, @User() user: UserInterface) {
+        return this.spaceService.create(data, { accessToken: user.accessToken });
     }
 
     @Mutation(() => SpaceResource)
-    async updateSpace(@Args('id') id: string, @Args('data') data: UpdateSpaceInput, @AuthToken() authToken?: string) {
-        return this.spaceService.update(id, data, { authToken });
+    async updateSpace(@Args('id') id: string, @Args('data') data: UpdateSpaceInput, @User() user: UserInterface) {
+        return this.spaceService.update(id, data, { accessToken: user.accessToken });
     }
 
     @Mutation(() => SpaceResource)
-    async deleteSpace(@Args('id') id: string, @AuthToken() authToken?: string) {
-        return this.spaceService.delete(id, { authToken });
+    async deleteSpace(@Args('id') id: string, @User() user: UserInterface) {
+        return this.spaceService.delete(id, { accessToken: user.accessToken });
     }
 
     @ResolveField(() => [Stack])
@@ -59,13 +61,13 @@ export class SpacesResolver {
         // @Context() context: GqlContext,
         @DataLoader(StacksBySpaceId) stacks: StacksBySpaceIdLoader,
         @Args() queryFilters: StacksQueryFilters,
-        @AuthToken() authToken?: string
+        @User() user: UserInterface
     ) {
-        // return this.stackService.find({ filters: { spaceId: space.id }, authToken });
-        // return context.dataloaders.stacksBySpaceIdLoader.load({ spaceId: space.id, authToken });
+        // return this.stackService.find({ filters: { spaceId: space.id }, accessToken });
+        // return context.dataloaders.stacksBySpaceIdLoader.load({ spaceId: space.id, accessToken });
 
         queryFilters.spaceId = space.id;
-        queryFilters.authToken = authToken;
+        queryFilters.accessToken = user.accessToken;
 
         return stacks.load(queryFilters);
     }
@@ -75,10 +77,10 @@ export class SpacesResolver {
         @Parent() space: Space,
         @DataLoader(NotebooksBySpaceId) notebooks: NotebooksBySpaceIdLoader,
         @Args() queryFilters: NotebooksQueryFilters,
-        @AuthToken() authToken?: string
+        @User() user: UserInterface
     ) {
         queryFilters.spaceId = space.id;
-        queryFilters.authToken = authToken;
+        queryFilters.accessToken = user.accessToken;
 
         return notebooks.load(queryFilters);
     }

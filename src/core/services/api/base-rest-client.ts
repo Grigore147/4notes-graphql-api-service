@@ -4,8 +4,8 @@ import { HttpClient } from './http-client';
 export abstract class BaseRestClient<Entity = any, Collection = any> {
     protected httpClient: HttpClient;
 
-    constructor(baseUrl: string, authToken?: string) {
-        this.httpClient = new HttpClient(baseUrl, authToken);
+    constructor(baseUrl: string, accessToken?: string) {
+        this.httpClient = new HttpClient(baseUrl, accessToken);
     }
 
     public async find(query?: IQueryFilters, options?: RequestInit): Promise<Collection> {
